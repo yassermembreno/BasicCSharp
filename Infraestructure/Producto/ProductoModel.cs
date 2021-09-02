@@ -1,4 +1,6 @@
 ﻿using Domain;
+using Domain.Enums;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,24 +11,10 @@ namespace Infraestructure
     {
         private Producto[] productos;
 
+        #region CRUD
         public void Add(Producto p)
         {
-            if(p == null)
-            {
-                throw new ArgumentException("Error, producto no puede ser null.");
-            }
-
-            if(productos == null)
-            {
-                productos = new Producto[1];
-                productos[productos.Length - 1] = p;
-                return;
-            }
-
-            Producto[] tmp = new Producto[productos.Length + 1];
-            Array.Copy(productos, tmp, productos.Length);
-            tmp[tmp.Length - 1] = p;
-            productos = tmp;
+            Add(p, ref productos);            
         }
 
         public bool Update(Producto p)
@@ -76,8 +64,10 @@ namespace Infraestructure
             
             return index < 0 ? null : productos[index];
         }
+        #endregion
 
-        public int GetIndex(Producto p)
+        #region Private Methods
+        private int GetIndex(Producto p)
         {
             int index = -1, i = 0;
             foreach(Producto prod in productos)
@@ -92,5 +82,70 @@ namespace Infraestructure
 
             return index;
         }
+
+        private void Add(Producto p, ref Producto[] pdts)
+        {
+            if(p == null)
+            {
+                throw new ArgumentException("El objeto no puede ser null.");
+            }
+            
+            if (pdts == null)
+            {
+                pdts = new Producto[1];
+                pdts[pdts.Length - 1] = p;             
+            }
+
+            Producto[] tmp = new Producto[pdts.Length + 1];
+            Array.Copy(pdts, tmp, pdts.Length);
+            tmp[tmp.Length - 1] = p;
+            pdts = tmp;
+        }
+        #endregion
+
+        #region Get
+        public Producto[] GetProductosPorUnidadMedida(UnidadMedida unidadMedida)
+        {
+            Producto[] pdts = null;
+            if(productos == null)
+            {
+                return pdts;
+            }
+
+            foreach(Producto p in productos)
+            {
+                if (p.UnidadMedida.Equals(unidadMedida))
+                {
+                    Add(p, ref pdts);
+                }
+            }
+
+            return pdts;
+        }
+
+        public Producto[] GetProductosPorCaducidad(DateTime dt)
+        {
+            Producto[] pdts = null;
+            if (productos == null)
+            {
+                return pdts;
+            }
+
+            foreach (Producto p in productos)
+            {
+                if (p.Caducidad <= dt)
+                {
+                    Add(p, ref pdts);
+                }
+            }
+
+            return pdts;
+        }
+
+        private string GetProductosAsJson(Producto[] pdts)
+        {
+            return JsonConvert.SerializeObject(pdts);
+        }
+        #endregion
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,6 +13,7 @@ namespace Domain
         public int Cantidad { get; set; }
         public decimal Precio { get; set; }
         public DateTime Caducidad { get; set; }
+        public UnidadMedida UnidadMedida { get; set; }
         
     }
 }
